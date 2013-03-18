@@ -104,7 +104,7 @@ describe "Worker", () ->
          .lpush("job_queue", '{"type":"test_lock","meta":{"job_num":3}}')
          .exec done
 
-      it "should process queued jobs in order when parallelized", (done) ->    
+      it "should lock jobs correctly", (done) ->    
          processCount = 0
 
          worker1 = new Worker()

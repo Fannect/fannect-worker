@@ -12,7 +12,6 @@
       "coffee-script": "1.4.0",
       "express": "3.0.1",
       "request": "2.12.0",
-      "connect-redis": "1.4.4",
       "redis-url": "0.1.0",
       "mime": "1.2.2",
       "underscore": "1.1.7",
@@ -34,6 +33,7 @@
       "fs-extra": "0.3.2"
    },
    "scripts": {
-      "test": "mocha --compilers coffee:coffee-script --reporter spec -t 10000 -s 300"
+      "test": "mocha --compilers coffee:coffee-script --reporter spec -t 10000 -s 300",
+      "test-common": "mocha --compilers coffee:coffee-script --reporter spec -t 10000 -s 300 ./common/test"
    }
 }
