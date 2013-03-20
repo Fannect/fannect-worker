@@ -9,8 +9,8 @@ mongoose.connect(process.env.MONGO_URL || "mongodb://admin:testing@linus.mongohq
 mongooseTypes.loadTypes(mongoose);
 
 sendgrid = new (require("sendgrid-web"))({ 
-   user: process.env.SENDGRID_USER or "fannect", 
-   key: process.env.SENDGRID_PASSWORD or "1Billion!" 
+   user: process.env.SENDGRID_USER || "fannect", 
+   key: process.env.SENDGRID_PASSWORD || "1Billion!" 
 });
 
 // Colors
