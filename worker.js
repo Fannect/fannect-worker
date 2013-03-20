@@ -1,6 +1,6 @@
 require("coffee-script");
 
-redis = (require("../common/utils/redis"))(process.env.REDIS_QUEUE_URL, "queue");
+redis = (require("./common/utils/redis"))(process.env.REDIS_QUEUE_URL, "queue");
 mongoose = require("mongoose");
 mongooseTypes = require("mongoose-types");
 
@@ -22,7 +22,10 @@ reset = "\u001b[0m";
 Worker = require("./lib/worker");
 
 worker = new Worker();
-worker.start();
+
+worker.on("start", function (err) {
+   console.log("Worker started!");
+});
 
 worker.on("error", function (err, job) {
    console.log(red + "ERROR: " + JSON.stringify(err)); 
@@ -32,12 +35,14 @@ worker.on("error", function (err, job) {
    error = err ? err.stack || err : "(none)"
 
    sendgrid.send({
-      to: process.env.EMAIL_TO or "blake@fannect.me"
-      from: "logger@fannect.me"
-      subject: "Worker Error"
+      to: process.env.EMAIL_TO || "blake@fannect.me",
+      from: "logger@fannect.me",
+      subject: "Worker Error",
       html: "Error: " + error + "<br>Job: " + JSON.stringify(job)
    });
 });
+
+worker.start();
 
 process.on("SIGTERM", function () {
    worker.stop();
