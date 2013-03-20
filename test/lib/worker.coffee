@@ -4,6 +4,7 @@ Job = require "../../common/jobs/Job"
 redis = require "../../common/utils/redis"
 queue = redis(null, "queue")
 queue2 = redis(null, "queue2")
+queue3 = redis(null, "queue3")
 
 Worker = require "../../lib/worker"
 
@@ -92,6 +93,74 @@ describe "Worker", () ->
          worker2.on "waiting", () -> 
             worker2.stop()
             worker2Done = true
+
+   describe "waiting behavior", () ->
+
+      it "should change from waiting state when a job is queued", (done) ->
+         worker = new Worker()
+
+         worker.start()
+
+         completed = 0
+         startedWaiting = false
+         worker.on "complete", () -> completed++
+
+         jobDef = '{"type":"test","meta":{"job_num":1}}'
+         
+         worker.on "waiting", () ->
+            if completed == 0
+               startedWaiting = true
+               setTimeout () ->
+                  queue2.multi()
+                  .ltrim("job_queue", -1, 0)
+                  .lpush("job_queue", jobDef)
+                  .publish("new_job", jobDef)
+                  .exec()
+               , 10
+            else
+               completed.should.equal(1)
+               startedWaiting.should.be.true
+               worker.stop()
+               done()
+
+      it "should only process a job once when multiple workers waiting", (done) ->
+         worker1 = new Worker()
+         worker2 = new Worker(queue2)
+
+         worker1.start()
+         worker2.start()
+
+         jobDef = '{"type":"test","meta":{"job_num":1}}'
+
+         completed = 0
+         process = 0
+
+         completedCallback = () ->
+            completed++
+            setTimeout () ->
+               process.should.equal(1)
+               completed.should.equal(1)
+               worker1.stop()
+               worker2.stop()
+               done()
+            , 110
+
+         worker1.on "complete", completedCallback
+         worker2.on "complete", completedCallback
+         worker1.on "process", () -> process++
+         worker2.on "process", () -> process++
+
+         worker1.on "waiting", () ->
+            return unless completed == 0
+            # This is required in case worker2 gets job instead of worker1
+            setTimeout () ->
+               return unless completed == 0
+               queue3.multi()
+               .ltrim("job_queue", -1, 0)
+               .lpush("job_queue", jobDef)
+               .publish("new_job", jobDef)
+               .exec()
+            , 60
 
    describe "processing with locking", () ->
 

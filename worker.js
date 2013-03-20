@@ -1,6 +1,6 @@
 require("coffee-script");
 
-redis = (require("../common/utils/redis"))(process.env.REDIS_URL);
+redis = (require("../common/utils/redis"))(process.env.REDIS_QUEUE_URL, "queue");
 mongoose = require("mongoose");
 mongooseTypes = require("mongoose-types");
 
