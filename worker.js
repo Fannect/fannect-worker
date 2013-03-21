@@ -1,10 +1,10 @@
 require("coffee-script");
 
-redis = (require("./common/utils/redis"))(process.env.REDIS_QUEUE_URL, "queue");
+redis = (require("./common/utils/redis"))(process.env.REDIS_QUEUE_URL || "redis://redistogo:f74caf74a1f7df625aa879bf817be6d1@perch.redistogo.com:9203", "queue");
 mongoose = require("mongoose");
 mongooseTypes = require("mongoose-types");
 
-mongoose.connect(process.env.MONGO_URL || "mongodb://admin:testing@linus.mongohq.com:10064/fannect");
+mongoose.connect(process.env.MONGO_URL || "mongodb://halloffamer:krzj2blW7674QGk3R1ll967LO41FG1gL2Kil@linus.mongohq.com:10045/fannect-dev");
 // mongoose.connect(process.env.MONGO_URL || "mongodb://halloffamer:krzj2blW7674QGk3R1ll967LO41FG1gL2Kil@fannect-production.member0.mongolayer.com:27017/fannect-production")
 mongooseTypes.loadTypes(mongoose);
 
@@ -26,6 +26,10 @@ worker = new Worker();
 worker.on("start", function (err) {
    console.log("Worker started!");
 });
+
+// worker.on("active", function () {
+//    console.log("Worker activated!");
+// });
 
 worker.on("error", function (err, job) {
    console.log(red + "ERROR: " + JSON.stringify(err)); 
