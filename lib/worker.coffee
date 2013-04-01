@@ -55,7 +55,10 @@ class Worker extends EventEmitter
 
       # process job and return
       run = () =>
+         # remove the job and then process
          @redis.lrem "job_queue", -1, jobDef, (err, result) =>
+            # move to the next job if failed to remove; ensures two workers
+            # don't work on the same job
             return @nextJob(index + 1) if result == 0
             @emit("process", job)
             job.run (err) =>
@@ -63,12 +66,18 @@ class Worker extends EventEmitter
                else @emit("complete", job)
 
                if job.is_locking
+                  # release lock
                   @redis.del "lock:#{job.locking_id}", (err, result) =>
                      @nextJob(0)
                else @nextJob(0)
 
       # check if job is locked
       if job.is_locking 
+
+         # create a temporary key, this is a workaround for lack of 
+         # setnxex (setnx and setex combined). Required so that a command can't 
+         # slip in between setnx and setex causing two workers to have the same 
+         # lock
          rand = Math.round(Math.random() * new Date())
          temp_key = "temp:#{job.locking_id}-#{rand}"
 

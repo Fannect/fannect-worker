@@ -1,6 +1,7 @@
 require("coffee-script");
 
-redis = (require("./common/utils/redis"))(process.env.REDIS_QUEUE_URL || "redis://redistogo:f74caf74a1f7df625aa879bf817be6d1@perch.redistogo.com:9203", "queue");
+redis = require("./common/utils/redis");
+queue = redis(process.env.REDIS_QUEUE_URL || "redis://redistogo:f74caf74a1f7df625aa879bf817be6d1@perch.redistogo.com:9203", "queue");
 mongoose = require("mongoose");
 mongooseTypes = require("mongoose-types");
 
@@ -48,6 +49,13 @@ worker.on("error", function (err, job) {
 
 worker.start();
 
-process.on("SIGTERM", function () {
+exit = function () {
+   console.log("Stopping worker...");
    worker.stop();
-});
+   redis.closeAll(function () {
+      process.exit();
+   });
+};
+
+process.on("SIGTERM", exit);
+process.on("SIGINT", exit);
