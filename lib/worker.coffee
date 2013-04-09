@@ -14,7 +14,7 @@ class Worker extends EventEmitter
                return console.error "Failed to reactivate: ", err if err
                @state = "active"
                @emit("active")
-               @process(message)
+               @nextJob()
 
    start: () =>
       @state = "active"
