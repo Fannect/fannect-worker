@@ -37,7 +37,7 @@ worker.on("process", function (job) {
    console.log("Processing:", job);
 });
 
-worker.on("completed", function (job) {
+worker.on("complete", function (job) {
    console.log("Completed:", job);
 });
 
