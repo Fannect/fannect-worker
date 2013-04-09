@@ -28,9 +28,9 @@ worker.on("start", function (err) {
    console.log("Worker started!");
 });
 
-// worker.on("active", function () {
-//    console.log("Worker activated!");
-// });
+worker.on("active", function () {
+   console.log("Worker activated!");
+});
 
 worker.on("error", function (err, job) {
    console.log(red + "ERROR: " + JSON.stringify(err)); 
