@@ -32,6 +32,10 @@ worker.on("active", function () {
    console.log("Worker activated!");
 });
 
+worker.on("waiting", function () {
+   console.log("Worker waiting...");
+}); 
+
 worker.on("error", function (err, job) {
    console.log(red + "ERROR: " + JSON.stringify(err)); 
    console.log(red + "\tJOB: " + JSON.stringify(job));
