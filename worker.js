@@ -32,6 +32,14 @@ worker.on("active", function () {
    console.log("Worker activated!");
 });
 
+worker.on("process", function (job) {
+   console.log("Processing:", job);
+});
+
+worker.on("completed", function (job) {
+   console.log("Completed:", job);
+});
+
 worker.on("waiting", function () {
    console.log("Worker waiting...");
 }); 
