@@ -15,6 +15,11 @@ class Worker extends EventEmitter
                @state = "active"
                @emit("active")
                @nextJob()
+      @redis.on "ready", () =>
+         # reconnect to subscribe if in waiting state
+         if @state == "waiting"
+            @redis.subscribe "new_job", (err) =>
+               console.error "Failed to resubscribe: ", err if err
 
    start: () =>
       @state = "active"
